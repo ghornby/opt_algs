@@ -178,8 +178,10 @@ void recombine_elliptic(vector<double>& parent1, vector<double>& parent2,
 			vector<double>& child1)
 {
   cerr << "alps_utils :: recombine_elliptic() - not implemented.\n";
-  while (1) ;
-  
+  while (1) {
+    ;
+  }  
+
    /* child1 - the random vector in the circle */
    for (vector<double>::size_type i=0; i<child1.size(); i++) {
      child1[i] = random_norm();
@@ -289,7 +291,7 @@ void recombine_elliptic(vector<double>& parent1, vector<double>& parent2,
 
 
 const double INTEGER_RANGE = 100.0;
-const int INT_RANGE = 100;
+//const int INT_RANGE = 100;
 
 
 int recombine_int(int val1, int val2)
@@ -566,7 +568,7 @@ int Individual :: compare_fitness(bool is_maximizing, Individual *individ2)
 
 
 //bool Individual :: same(Individual *individ2)
-bool Individual :: same(Individual *)
+bool Individual :: same(const Individual *)
 {
   // To be implemented by subclass.
   return true;

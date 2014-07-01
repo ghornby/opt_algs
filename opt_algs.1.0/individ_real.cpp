@@ -121,7 +121,7 @@ void Individ_Real :: clear()
 }
 
 
-int Individ_Real :: same(const Individ_Real *individ2)
+bool Individ_Real :: same(const Individ_Real *individ2)
 {
   int result = true;
 
