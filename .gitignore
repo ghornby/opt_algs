@@ -16,6 +16,7 @@
 *.lib
 
 # Executables
+examples/*/oa_ex1
 *.exe
 *.out
 *.app
