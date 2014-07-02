@@ -78,7 +78,7 @@ public:
   virtual int better(bool is_maximizing);
   virtual bool keep(bool is_maximize);
   virtual int compare_fitness(bool is_maximizing, Individual *individ2);
-  virtual bool same(Individual *individ2);
+  virtual bool same(const Individual *individ2);
   bool created_by_variation();
 
   double get_fitness() const;

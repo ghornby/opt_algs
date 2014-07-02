@@ -39,7 +39,7 @@ public:
   std::string get_class_name() const { return class_name_; }
   Individ_Real* new_instance() const;
   void clear();
-  int same(const Individ_Real *individ2);
+  bool same(const Individ_Real *individ2);
 
   void set_minmax(std::vector<double>& min,
 		  std::vector<double>& max);
