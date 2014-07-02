@@ -26,10 +26,10 @@ CC = g++
 
 
 
-LINK =  \
-	-l$(COMMON_CLASSES_VERSION) \
+LINK =  -L$(LIBRARY_ROOT_PATH)/lib \
 	-l$(OPTALG_VERSION) \
-	-L$(LIBRARY_ROOT_PATH)/lib -lcmnclass \
+	-l$(COMMON_CLASSES_VERSION) \
+	-L$(LIBRARY_ROOT_PATH)/lib \
 	-lm -lstdc++ -lgmp -lgmpxx \
 	-pthread
 
