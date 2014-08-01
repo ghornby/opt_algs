@@ -64,7 +64,7 @@ double OAFRosen :: evaluate(Individual* ind)
 
   ind_real->set_fitness(fitness);
   update_best(fitness);
-  num_evaluations_ += 1;
+  increment_num_evals();
 
   return fitness;
 }

@@ -350,16 +350,20 @@ const string Individual :: class_name_("Individual");
 // Individual class functions.
 
 Individual :: Individual()
-  : is_deleted_(false), design_id_(0)
+  : is_deleted_(false), is_eval_ok_(true), design_id_(0)
 {
 }
 
 
-Individual :: Individual(const Individual *)
-  : is_deleted_(false), design_id_(0)
+Individual :: Individual(const Individual *sample)
+  : is_deleted_(false), is_eval_ok_(true), design_id_(0)
 {
   if (is_print_log_) {
     CmnClass::Logger::Msg() << "individual :: individual(individual* sample)" << endl;
+  }
+
+  if (sample) {
+    is_eval_ok_ = sample->is_eval_ok_;
   }
 }
 
@@ -402,7 +406,7 @@ void Individual :: clear()
   history_parent1_.clear();
   history_parent2_.clear();
 
-  evaluations_ = 0;
+  num_evaluations_ = 0;
   design_id_ = 0;
 
   for (vector<double>::size_type i=0; i<features_.size(); i++) {
@@ -411,7 +415,7 @@ void Individual :: clear()
 }
 
 
-bool Individual :: valid()
+bool Individual :: valid() const
 {
   return true;
 }
@@ -420,7 +424,7 @@ bool Individual :: valid()
 // fitness_hist_diff() - returns the different in fitness
 // between this individual and its parent: (this fitness - parent fitness).
 // parent is taken as the first parent.
-double Individual :: fitness_hist_diff(int index)
+double Individual :: fitness_hist_diff(int index) const
 {
   if ((index < 0) || (index >= gNum_Fitness)) {
     CmnClass::Logger::Msg() << "individual :: fitness_hist_diff() - error on fitness index: "
@@ -432,7 +436,7 @@ double Individual :: fitness_hist_diff(int index)
     - history_parent1_.get_fitness(index);
 }
 
-double Individual :: fitness_hist_diff()
+double Individual :: fitness_hist_diff() const
 {
   return (history_self_.get_fitness() - history_parent1_.get_fitness());
 }
@@ -442,7 +446,7 @@ double Individual :: fitness_hist_diff()
 // Returns 1 if better fitness than parent(s)
 // returns 0 if equal/inbetween parent(s)
 // returns -1 if strictly less than parent(s).
-int Individual :: better(bool is_maximizing)
+int Individual :: better(bool is_maximizing) const
 {
   if (is_maximizing) {
     if ((history_self_.get_fitness() > history_parent1_.get_fitness()) &&
@@ -474,19 +478,20 @@ int Individual :: better(bool is_maximizing)
 
 // Conditions for keeping this individual versus re-applying
 // variation to the parent(s).
-bool Individual :: keep(bool is_maximizing)
+bool Individual :: is_keep(bool is_maximizing) const
 {
   if (is_maximizing) {
+    //    CmnClass::Logger::Msg() << "is_keep(" << is_maximizing << ") - start" << endl;
     if (history_self_.get_how_created() == CREATE_RANDOM) {
       if (history_self_.get_fitness() > 0.0) {
 	/*
-	  printf("individual :: keep() - init fitness %f > 0.0, keep.\n",
+	  printf("individual :: is_keep() - init fitness %f > 0.0, keep.\n",
 	  history_self_.get_fitness());
 	*/
 	return true;
       }
       /*
-	printf("individual :: keep() - init fitness %f <= 0.0, don't keep.\n",
+	printf("individual :: is_keep() - init fitness %f <= 0.0, don't keep.\n",
 	history_self_.get_fitness());
       */
       return false;
@@ -494,7 +499,7 @@ bool Individual :: keep(bool is_maximizing)
     
     if (history_self_.get_fitness() >= history_parent1_.get_fitness()*0.1) {
       /*
-	printf("individual :: keep() - fitness %f > 0.1* %f keep.  (Created=%d).\n",
+	printf("individual :: is_keep() - fitness %f > 0.1* %f keep.  (Created=%d).\n",
 	history_self_.get_fitness(), history_parent1_.get_fitness(),
 	history_self_.get_how_created());
       */
@@ -505,13 +510,13 @@ bool Individual :: keep(bool is_maximizing)
     if (history_self_.get_how_created() == CREATE_RANDOM) {
       if (history_self_.get_fitness() < Worst_Fitness) {
 	/*
-	  printf("individual :: keep() - init fitness %f > 0.0, keep.\n",
+	  printf("individual :: is_keep() - init fitness %f > 0.0, keep.\n",
 	  history_self_.get_fitness());
 	*/
 	return true;
       }
       /*
-	printf("individual :: keep() - init fitness %f <= 0.0, don't keep.\n",
+	printf("individual :: is_keep() - init fitness %f <= 0.0, don't keep.\n",
 	history_self_.get_fitness());
       */
       return false;
@@ -519,7 +524,7 @@ bool Individual :: keep(bool is_maximizing)
     
     if (history_self_.get_fitness() <= history_parent1_.get_fitness()*100.0) {
       /*
-	printf("individual :: keep() - fitness %f > 0.1* %f keep.  (Created=%d).\n",
+	printf("individual :: is_keep() - fitness %f > 0.1* %f keep.  (Created=%d).\n",
 	history_self_.get_fitness(), history_parent1_.get_fitness(),
 	history_self_.get_how_created());
       */
@@ -529,7 +534,7 @@ bool Individual :: keep(bool is_maximizing)
 
 
   /*
-  printf("individual :: keep() - fitness %f < 0.1x %f, don't keep.\n",
+  printf("individual :: is_keep() - fitness %f < 0.1x %f, don't keep.\n",
 	 history_self_.get_fitness(), history_parent1_.get_fitness());
   */
 
@@ -568,21 +573,21 @@ int Individual :: compare_fitness(bool is_maximizing, Individual *individ2)
 
 
 //bool Individual :: same(Individual *individ2)
-bool Individual :: same(const Individual *)
+bool Individual :: same(const Individual *) const
 {
   // To be implemented by subclass.
   return true;
 }
 
 
-bool Individual :: created_by_variation()
+bool Individual :: created_by_variation() const
 {
   if ((history_self_.get_how_created() != CREATE_MUTATE) &&
       (history_self_.get_how_created() != CREATE_RECOMBINE)) {
     return false;
   }
 
-  return (evaluations_ == 1);
+  return (num_evaluations_ == 1);
 }
 
 
@@ -610,22 +615,22 @@ void Individual :: set_fitness(bool maximize, const vector<double>& fitness_vec)
 
   /*
   CmnClass::Logger::Msg() << "individual() :: set_fit() " << fitness_vec[0]
-       << " evals=" << evaluations_ << endl;
+       << " evals=" << num_evaluations_ << endl;
   */
 
   history_self_.backup_fitness();
 
-  evaluations_++;
+  num_evaluations_++;
   history_self_.set_fitness(fitness_vec);
 
   /* OLD
-  if (evaluations_ >= 1) {
+  if (num_evaluations_ >= 1) {
     // Average fitness values.
-    evaluations_++;
+    num_evaluations_++;
     history_self_.avg_fitness(fitness_vec);
 
   } else {
-    evaluations_ = 1;
+    num_evaluations_ = 1;
     history_self_.set_fitness(fitness_vec);
   }
   */
@@ -669,18 +674,18 @@ void Individual :: set_fitness(double fitness)
 
 void Individual :: reset_num_evaluations()
 {
-  evaluations_ = 0;
+  num_evaluations_ = 0;
 }
 
 
-int Individual :: get_num_evaluations()
+int Individual :: get_num_evaluations() const
 {
-  return evaluations_;
+  return num_evaluations_;
 }
 
 void Individual :: incr_num_evaluations()
 {
-  evaluations_++;
+  num_evaluations_++;
 }
 
 
@@ -739,7 +744,7 @@ void Individual :: set_creation(int type)
   history_self_.set_how_created(type);
 }
 
-int Individual :: get_creation()
+int Individual :: get_creation() const
 {
   return history_self_.get_how_created();
 }
@@ -768,7 +773,7 @@ void Individual :: make_random()
 {
   design_id_ = 0;
 
-  evaluations_ = 0;
+  num_evaluations_ = 0;
   history_self_.clear();
   history_self_.set_how_created(CREATE_RANDOM);
 
@@ -786,7 +791,7 @@ void Individual :: duplicate(const Individual *ind_src)
 {
   design_id_ = ind_src->design_id_;
 
-  evaluations_ = ind_src->evaluations_;
+  num_evaluations_ = ind_src->num_evaluations_;
   history_self_ = ind_src->history_self_;
   assign_age_type_ = ind_src->assign_age_type_;
 
@@ -802,7 +807,7 @@ bool Individual :: mutate(double scale)
 {
   //  cout << "Individual :: mutate(d)" << endl;
   design_id_ = 0; // No longer valid.
-  evaluations_ = 0;
+  num_evaluations_ = 0;
 
   history_parent1_ = history_self_;
   history_self_.incr_num_mutate();
@@ -835,7 +840,7 @@ bool Individual :: mutate(vector<Individual*>&)
 bool Individual :: recombine(double scale, Individual *parent2)
 {
   design_id_ = 0; // No longer valid.
-  evaluations_ = 0;
+  num_evaluations_ = 0;
 
   // History for this individual.
   history_parent1_ = history_self_;
@@ -1038,14 +1043,17 @@ istream& Individual :: read(istream& istr)
   }  
 
   
-  // Line 2: Read ID:
+  // Line 2: Read ID line:
   getline(istr, line);
   split(line, ' ', words);
-  if (words.size() != 1) {
+  if (words.size() != 3) {
     CmnClass::Logger::Msg() << "individual :: read() - error parsing: ]" << line << "[" << endl;
     throw runtime_error("individual :: read() - error config line: " + line);
   }
   design_id_.set_str(words[0], 10);
+
+  is_eval_ok_ = from_string<bool>(words[1]);
+  num_evaluations_ = from_string<unsigned int>(words[2]);
 
 
   istr >> history_self_;
@@ -1075,7 +1083,8 @@ bool Individual :: read(const char *fname)
 ostream& Individual :: write(ostream& ostr) const
 {
   ostr << "IndV " << INDIVIDUAL_VERSION << endl;
-  ostr << design_id_ << endl;
+  ostr << design_id_ << " " << is_eval_ok_ << " "
+       << num_evaluations_ << endl;
   history_self_.write(ostr);
   //  ostr << history_parent1_;
   //  ostr << history_parent2_;
@@ -1136,10 +1145,10 @@ void Individual :: print_history_full()
 {
   streamsize prec = cout.precision();
 
-  if (evaluations_ > 1) {
+  if (num_evaluations_ > 1) {
     double diff, val;
 
-    cout << "Evl(" << evaluations_ << ")                     ";
+    cout << "Evl(" << num_evaluations_ << ")                     ";
     val = get_fitness();
     diff = val - history_self_.get_fitness_prev();
     history_parent1_.print_f1(cout);

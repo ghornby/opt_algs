@@ -84,9 +84,15 @@ HillClimber :: HillClimber(const FitnessFunc* func, const Individual* ind_templa
   : OptAlg(func, ind_template), individ_best_(0), individ_new_(0)
 {
   individ_best_ = ind_template->new_instance();
-  individ_new_ = ind_template->new_instance();
+  individ_best_->duplicate(ind_template);
 
-  individ_best_->make_random();
+  individ_new_ = ind_template->new_instance();
+  /*
+  CmnClass::Logger::Msg() << "individ_best #evals: "
+			  << individ_best_->get_num_evaluations() << endl;
+  CmnClass::Logger::Msg() << "individ_template #evals: "
+			  << ind_template->get_num_evaluations() << endl;
+  */
 }
 
 
@@ -154,8 +160,20 @@ int HillClimber :: configure(const char *, int)
 
 void HillClimber :: do_search_step()
 {
-  individ_new_->duplicate(individ_best_);
-  individ_new_->mutate();
+  if (individ_best_->is_keep(is_maximizing_)) {
+    // If best individual is good enough to keep,
+    // copy and mutate:
+    CmnClass::Logger::Msg() << "HC :: do_search_step() - mutating" << endl;
+    individ_new_->duplicate(individ_best_);
+    individ_new_->mutate();
+
+  } else {
+    CmnClass::Logger::Msg() << "HC :: do_search_step() - make random" << endl;
+    // Best individual is flawed (typically at start of run)
+    // so create a new random individual to start from:
+    individ_new_->make_random();
+  }
+
   double val = fitness_func_->evaluate(individ_new_);
 
   if (individ_best_->compare_fitness(is_maximizing_, individ_new_) == -1) {
@@ -164,6 +182,25 @@ void HillClimber :: do_search_step()
   }
 
   increment_num_evals();
+
+  /*
+  unsigned int num_evals = get_num_evals();
+  stringstream fname;
+  fname << "step_";
+  if (num_evals < 10) {
+    fname << "0";
+  }
+  if (num_evals < 100) {
+    fname << "0";
+  }
+  if (num_evals < 1000) {
+    fname << "0";
+  }
+  fname << num_evals << ".ind";
+
+  string fn_str(fname.str());
+  individ_new_->write(fn_str.c_str());
+  */
 }
 
 

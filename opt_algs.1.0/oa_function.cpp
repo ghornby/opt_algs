@@ -34,6 +34,12 @@ FitnessFunc :: ~FitnessFunc()
 }
 
 
+void FitnessFunc :: increment_num_evals()
+{
+  num_evaluations_++;
+}
+
+
 void FitnessFunc :: update_best(double val)
 {
   if (num_evaluations_ == 0) {

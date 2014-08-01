@@ -33,6 +33,7 @@ class FitnessFunc
   virtual FitnessFunc* new_instance() const = 0;
   virtual double evaluate(Individual*) = 0;
 
+  void increment_num_evals();
   unsigned int get_num_evaluations() const { return num_evaluations_; };
   double get_best_fitness() const { return best_fitness_; };
 

@@ -66,20 +66,20 @@ public:
 
   /*** Interface Methods ***/
   virtual void clear();
-  virtual bool valid();
+  virtual bool valid() const;
 
   void set_id(const mpz_class& id) { design_id_ = id; };
   mpz_class get_id() const { return design_id_; };
   std::string get_id_string() const { return design_id_.get_str(); };
 
 
-  double fitness_hist_diff(int index);
-  double fitness_hist_diff();
-  virtual int better(bool is_maximizing);
-  virtual bool keep(bool is_maximize);
+  double fitness_hist_diff(int index) const;
+  double fitness_hist_diff() const;
+  virtual int better(bool is_maximizing) const;
+  virtual bool is_keep(bool is_maximize) const;
   virtual int compare_fitness(bool is_maximizing, Individual *individ2);
-  virtual bool same(const Individual *individ2);
-  bool created_by_variation();
+  virtual bool same(const Individual *individ2) const;
+  bool created_by_variation() const;
 
   double get_fitness() const;
   void get_fitness(std::vector<double>& fitness_vec) const;
@@ -88,8 +88,11 @@ public:
   void set_fitness(bool maximize, const std::vector<double>& fitness_vec);
   void set_fitness(std::vector<double>& fitness_vec);
 
+  void set_eval_ok() { is_eval_ok_ = true; }
+  void set_eval_fail() { is_eval_ok_ = false; }
+
   void reset_num_evaluations();
-  int get_num_evaluations();
+  int get_num_evaluations() const;
   void incr_num_evaluations();
 
   int get_age() const;
@@ -105,7 +108,7 @@ public:
   void set_take_age_younger();
 
   void set_creation(int type);
-  int get_creation();
+  int get_creation() const;
   
   void print_history();
 
@@ -159,8 +162,9 @@ protected:
 
 private:
   bool is_deleted_;
+  bool is_eval_ok_;
   mpz_class design_id_;
-  int evaluations_; // Count of number of times evaluated.
+  unsigned int num_evaluations_; // Count of number of times evaluated.
   int age_move_; // For steady-state ALPS: try_move_up()
   int assign_age_type_;
 
