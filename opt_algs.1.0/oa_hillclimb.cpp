@@ -160,19 +160,24 @@ int HillClimber :: configure(const char *, int)
 
 void HillClimber :: do_search_step()
 {
+  //  individ_best_->write("best.ind");
+
   if (individ_best_->is_keep(is_maximizing_)) {
     // If best individual is good enough to keep,
     // copy and mutate:
-    CmnClass::Logger::Msg() << "HC :: do_search_step() - mutating" << endl;
+    //    CmnClass::Logger::Msg() << "HC :: do_search_step() - mutating" << endl;
     individ_new_->duplicate(individ_best_);
+    //    individ_best_->write("duplicate.ind");
     individ_new_->mutate();
 
   } else {
-    CmnClass::Logger::Msg() << "HC :: do_search_step() - make random" << endl;
+    //    CmnClass::Logger::Msg() << "HC :: do_search_step() - make random" << endl;
     // Best individual is flawed (typically at start of run)
     // so create a new random individual to start from:
     individ_new_->make_random();
   }
+
+  //  individ_best_->write("new.ind");
 
   double val = fitness_func_->evaluate(individ_new_);
 
