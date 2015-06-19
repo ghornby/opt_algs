@@ -13,11 +13,13 @@ See the file "license.txt" in the root directory for full details.
 #ifndef INDIVIDUAL_HEADER_FILE
 #define INDIVIDUAL_HEADER_FILE
 
-#include <iostream>
+#include "ind_history.h"
+
+#include <cstdlib>
 #include <fstream>
 #include <gmpxx.h>
+#include <iostream>
 
-#include "ind_history.h"
 
 const double Worst_Fitness = 1.5E+15;
 const int NUM_HISTORY_OPS = 15;
