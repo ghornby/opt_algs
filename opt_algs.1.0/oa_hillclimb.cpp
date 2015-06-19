@@ -83,10 +83,12 @@ const string HillClimber :: class_name_("HillClimber");
 HillClimber :: HillClimber(const FitnessFunc* func, const Individual* ind_template)
   : OptAlg(func, ind_template), individ_best_(0), individ_new_(0)
 {
-  individ_best_ = ind_template->new_instance();
-  individ_best_->duplicate(ind_template);
+  if (ind_template) {
+    individ_best_ = ind_template->new_instance();
+    individ_best_->duplicate(ind_template);
 
-  individ_new_ = ind_template->new_instance();
+    individ_new_ = ind_template->new_instance();
+  }
   /*
   CmnClass::Logger::Msg() << "individ_best #evals: "
 			  << individ_best_->get_num_evaluations() << endl;

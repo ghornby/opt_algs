@@ -165,7 +165,8 @@ void OptAlg :: set_random_seed(unsigned long seed)
  *
  */
 OptAlg :: OptAlg(const FitnessFunc* func, const Individual* ind_template)
-  : is_maximizing_(false), num_evaluations_(0), ind_template_(0), ind_seed_(0)
+  : is_maximizing_(false), num_evaluations_(0), ind_template_(0),
+    ind_seed_(0)
 {
   is_print_debug_info_ = false;
   is_run_sample_ = false;
@@ -180,7 +181,10 @@ OptAlg :: OptAlg(const FitnessFunc* func, const Individual* ind_template)
     ind_template_ = 0;
   }
 
-  fitness_func_ = func->new_instance();
+  fitness_func_ = 0;
+  if (func) {
+    fitness_func_ = func->new_instance();
+  }
 }
 
 

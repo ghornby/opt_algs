@@ -16,7 +16,7 @@ PROJECT_INCLUDES = -I$(HOME)/include/ \
 #OPTFLAGS = -Wall -O3 -march=i686 -fforce-addr -fomit-frame-pointer -funroll-loops -frerun-cse-after-loop -frerun-loop-opt -falign-functions=4
 #OPTFLAGS = -Wall -O2
 OPTFLAGS = -g -Wall
-CFLAGS = $(OPTFLAGS)
+CFLAGS = -std=c++11 $(OPTFLAGS)
 INCL =	$(PROJECT_INCLUDES)
 
 UNAME := $(shell uname -s)
