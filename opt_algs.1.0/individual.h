@@ -17,7 +17,6 @@ See the file "license.txt" in the root directory for full details.
 
 #include <cstdlib>
 #include <fstream>
-#include <gmpxx.h>
 #include <iostream>
 
 
@@ -70,9 +69,9 @@ public:
   virtual void clear();
   virtual bool valid() const;
 
-  void set_id(const mpz_class& id) { design_id_ = id; };
-  mpz_class get_id() const { return design_id_; };
-  std::string get_id_string() const { return design_id_.get_str(); };
+  void set_id(const unsigned int id) { design_id_ = id; };
+  unsigned int get_id() const { return design_id_; };
+  //  std::string get_id_string() const { return design_id_.get_str(); };
 
 
   double fitness_hist_diff(int index) const;
@@ -165,7 +164,7 @@ protected:
 private:
   bool is_deleted_;
   bool is_eval_ok_;
-  mpz_class design_id_;
+  unsigned int design_id_;
   unsigned int num_evaluations_; // Count of number of times evaluated.
   int age_move_; // For steady-state ALPS: try_move_up()
   int assign_age_type_;
